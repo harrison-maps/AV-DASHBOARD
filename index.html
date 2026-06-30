@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Consults Limited - AV Control Panel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+  body {
+    background: #1e2530;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .panel {
+    background: #f4f1ea;
+    border-radius: 18px;
+    padding: 24px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .room-name { font-size: 17px; font-weight: bold; color: #1e2530; }
+  .status { font-size: 12px; color: #5f6b7a; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #2e9e5b; display: inline-block; }
+
+  .rec-banner {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: #f9d4d4;
+    color: #9b1c1c;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 14px;
+  }
+  .rec-banner.show { display: flex; }
+  .rec-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #c02626;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .btn {
+    height: 96px;
+    border-radius: 14px;
+    border: 2px solid #c9c4b6;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #1e2530;
+    transition: all 0.15s ease;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn .icon { font-size: 30px; }
+  .btn.active { background: #d9ecff; border-color: #4a8fd6; }
+  .btn.warn { background: #fff3d6; border-color: #d99e2b; }
+  .btn.danger-active { background: #f9d4d4; border-color: #c02626; }
+
+  .row-btn {
+    width: 100%;
+    height: 52px;
+    border-radius: 12px;
+    border: 2px solid #c9c4b6;
+    background: transparent;
+    color: #5f6b7a;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .emergency {
+    width: 100%;
+    height: 60px;
+    border-radius: 12px;
+    border: 2px solid #c02626;
+    background: #f9d4d4;
+    color: #9b1c1c;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .emergency:active { transform: scale(0.97); }
+
+  .footer-note {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #d9d4c6;
+    font-size: 11px;
+    color: #8a8478;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="panel">
+
+  <div class="header">
+    <div class="room-name">Uganda HQ Boardroom</div>
+    <div class="status"><span class="dot"></span>connected</div>
+  </div>
+
+  <div class="rec-banner" id="recBanner">
+    <span class="rec-dot"></span> RECORDING IN PROGRESS
+  </div>
+
+  <div class="grid">
+    <button class="btn" id="meetingBtn" onclick="toggleMeeting()">
+      <span class="icon">📹</span>
+      <span id="meetingLabel">Start Meeting</span>
+    </button>
+
+    <button class="btn" id="muteBtn" onclick="toggleMute()">
+      <span class="icon" id="muteIcon">🎤</span>
+      <span id="muteLabel">Mute All Mics</span>
+    </button>
+
+    <button class="btn" id="shutterBtn" onclick="toggleShutter()">
+      <span class="icon" id="shutterIcon">📷</span>
+      <span id="shutterLabel">Open Camera</span>
+    </button>
+
+    <button class="btn" id="recordBtn" onclick="toggleRecord()">
+      <span class="icon">⏺️</span>
+      <span id="recordLabel">Start Recording</span>
+    </button>
+  </div>
+
+  <button class="row-btn" onclick="alert('Calling HQ IT Support...')">
+    🎧 Call HQ IT Support
+  </button>
+
+  <button class="emergency" onclick="emergencyStop()">
+    ⚠️ EMERGENCY STOP ALL
+  </button>
+
+  <div class="footer-note">
+    No recording starts automatically &middot; Camera shutter defaults to closed
+  </div>
+
+</div>
+
+<script>
+  let meetingOn = false;
+  let muted = false;
+  let shutterClosed = true;
+  let recording = false;
+
+  function toggleMeeting() {
+    meetingOn = !meetingOn;
+    document.getElementById('meetingLabel').textContent = meetingOn ? 'End Meeting' : 'Start Meeting';
+    document.getElementById('meetingBtn').classList.toggle('active', meetingOn);
+  }
+
+  function toggleMute() {
+    muted = !muted;
+    document.getElementById('muteLabel').textContent = muted ? 'Unmute All Mics' : 'Mute All Mics';
+    document.getElementById('muteIcon').textContent = muted ? '🔇' : '🎤';
+    document.getElementById('muteBtn').classList.toggle('warn', muted);
+  }
+
+  function toggleShutter() {
+    shutterClosed = !shutterClosed;
+    document.getElementById('shutterLabel').textContent = shutterClosed ? 'Open Camera' : 'Close Camera';
+    document.getElementById('shutterIcon').textContent = shutterClosed ? '🚫' : '📷';
+    document.getElementById('shutterBtn').classList.toggle('active', !shutterClosed);
+  }
+
+  function toggleRecord() {
+    recording = !recording;
+    document.getElementById('recordLabel').textContent = recording ? 'Stop Recording' : 'Start Recording';
+    document.getElementById('recordBtn').classList.toggle('danger-active', recording);
+    document.getElementById('recBanner').classList.toggle('show', recording);
+  }
+
+  function emergencyStop() {
+    meetingOn = false;
+    recording = false;
+    shutterClosed = true;
+    muted = true;
+
+    document.getElementById('meetingLabel').textContent = 'Start Meeting';
+    document.getElementById('meetingBtn').classList.remove('active');
+
+    document.getElementById('recordLabel').textContent = 'Start Recording';
+    document.getElementById('recordBtn').classList.remove('danger-active');
+    document.getElementById('recBanner').classList.remove('show');
+
+    document.getElementById('shutterLabel').textContent = 'Open Camera';
+    document.getElementById('shutterIcon').textContent = '🚫';
+    document.getElementById('shutterBtn').classList.remove('active');
+
+    document.getElementById('muteLabel').textContent = 'Unmute All Mics';
+    document.getElementById('muteIcon').textContent = '🔇';
+    document.getElementById('muteBtn').classList.add('warn');
+
+    alert('Emergency stop activated: meeting ended, recording stopped, camera closed, mics muted.');
+  }
+</script>
+
+</body>
+</html>
