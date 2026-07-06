@@ -3,229 +3,738 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Consults Limited - AV Control Panel</title>
+<title>Global Consults Limited — AV Control Dashboard</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
-  body {
-    background: #1e2530;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .panel {
-    background: #f4f1ea;
-    border-radius: 18px;
-    padding: 24px;
-    width: 100%;
-    max-width: 440px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  }
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-  .room-name { font-size: 17px; font-weight: bold; color: #1e2530; }
-  .status { font-size: 12px; color: #5f6b7a; display: flex; align-items: center; gap: 6px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #2e9e5b; display: inline-block; }
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-  .rec-banner {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    background: #f9d4d4;
-    color: #9b1c1c;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 14px;
-  }
-  .rec-banner.show { display: flex; }
-  .rec-dot {
-    width: 10px; height: 10px; border-radius: 50%; background: #c02626;
-    animation: blink 1s infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+:root {
+  --navy: #15233a;
+  --navy-deep: #0d1726;
+  --teal: #2d5f5d;
+  --gold: #c9a227;
+  --cream: #f6f3ec;
+  --paper: #fbf9f4;
+  --ink: #1c2430;
+  --muted: #6b7280;
+  --shield: #7a3b46;
+  --line: rgba(21,35,58,0.12);
+  --radius: 10px;
+  --green: #2e7d52;
+  --red: #b91c1c;
+  --amber: #b45309;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); }
+.app { display: flex; min-height: 100vh; }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  .btn {
-    height: 96px;
-    border-radius: 14px;
-    border: 2px solid #c9c4b6;
-    background: #ffffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #1e2530;
-    transition: all 0.15s ease;
-  }
-  .btn:active { transform: scale(0.96); }
-  .btn .icon { font-size: 30px; }
-  .btn.active { background: #d9ecff; border-color: #4a8fd6; }
-  .btn.warn { background: #fff3d6; border-color: #d99e2b; }
-  .btn.danger-active { background: #f9d4d4; border-color: #c02626; }
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: var(--navy-deep); color: #dfe6ee;
+  padding: 24px 16px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.brand { font-family: 'Source Serif 4', serif; font-weight: 700; font-size: 1.1rem; color: #fff; line-height: 1.3; margin-bottom: 2px; }
+.brand-sub { font-size: 0.68rem; color: var(--gold); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.brand-role { font-size: 0.75rem; color: #7a9ab5; margin-bottom: 24px; }
 
-  .row-btn {
-    width: 100%;
-    height: 52px;
-    border-radius: 12px;
-    border: 2px solid #c9c4b6;
-    background: transparent;
-    color: #5f6b7a;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
-  .emergency {
-    width: 100%;
-    height: 60px;
-    border-radius: 12px;
-    border: 2px solid #c02626;
-    background: #f9d4d4;
-    color: #9b1c1c;
-    font-size: 16px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    cursor: pointer;
-  }
-  .emergency:active { transform: scale(0.97); }
+.nav-section { font-size: 0.62rem; color: #4a6070; text-transform: uppercase; letter-spacing: .1em; margin: 18px 0 6px 10px; }
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 12px; border-radius: 8px; margin-bottom: 2px;
+  font-size: 0.84rem; cursor: pointer; color: #b9c4d3;
+  transition: background .15s, color .15s; border: 1px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.nav-item.active { background: rgba(201,162,39,0.12); color: #f3d98a; border-color: rgba(201,162,39,0.3); }
+.nav-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-ug { background: #c9a227; }
+.dot-ke { background: #2d5f5d; }
+.dot-tz { background: #4a7bc4; }
+.dot-rw { background: #7a3b46; }
+.dot-hub { background: #3a7c5e; }
 
-  .footer-note {
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid #d9d4c6;
-    font-size: 11px;
-    color: #8a8478;
-    text-align: center;
-  }
+.sidebar-status { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.07); }
+.status-row { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; color: #5e6c7e; margin-bottom: 4px; }
+.pulse { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* ── MAIN ────────────────────────────────────────────── */
+.main { flex: 1; padding: 32px 36px; overflow-x: hidden; }
+.panel { display: none; }
+.panel.active { display: block; animation: fadein .2s ease; }
+@keyframes fadein { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+
+.page-title { font-family: 'Source Serif 4', serif; font-weight: 700; font-size: 1.8rem; color: var(--navy); margin-bottom: 4px; }
+.page-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 24px; max-width: 680px; line-height: 1.6; }
+h2.sh { font-family: 'Source Serif 4', serif; font-size: 1.1rem; color: var(--navy); margin: 28px 0 12px; padding-top: 20px; border-top: 1px solid var(--line); }
+h2.sh:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+/* ── STATS GRID ──────────────────────────────────────── */
+.stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.stat-card .s-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+.stat-card .s-val { font-family: 'Source Serif 4', serif; font-size: 1.45rem; color: var(--navy); font-weight: 600; }
+.stat-card .s-sub { font-size: 0.73rem; color: var(--muted); margin-top: 2px; }
+
+/* ── SITE HEADER BANNER ──────────────────────────────── */
+.site-banner {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; border-radius: var(--radius); margin-bottom: 20px;
+  border: 1px solid var(--line); background: var(--paper);
+}
+.site-flag { font-size: 2rem; line-height: 1; }
+.site-banner-info .site-title { font-family: 'Source Serif 4', serif; font-weight: 700; font-size: 1.15rem; color: var(--navy); }
+.site-banner-info .site-desc { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.site-badge { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; }
+.badge-online { color: var(--green); }
+
+/* ── ROOM CARDS ──────────────────────────────────────── */
+.rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.room-card {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px 18px; transition: box-shadow .15s;
+}
+.room-card:hover { box-shadow: 0 2px 12px rgba(21,35,58,0.08); }
+.room-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.room-name { font-family: 'Source Serif 4', serif; font-size: 0.95rem; color: var(--navy); font-weight: 600; max-width: 200px; }
+.rtag { font-size: 0.63rem; padding: 3px 8px; border-radius: 10px; font-weight: 700; letter-spacing: .03em; flex-shrink: 0; margin-left: 8px; }
+.rtag-board { background: #eef3f1; color: var(--teal); }
+.rtag-priv { background: #fbf3f4; color: var(--shield); }
+
+.room-status { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; margin-bottom: 12px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.s-idle { background: #9ca3af; }
+.s-active { background: #22c55e; animation: pulse 2s infinite; }
+.s-locked { background: #ef4444; }
+
+.room-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ctrl-btn {
+  height: 44px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--paper); font-size: 0.78rem; color: var(--navy);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 6px; font-family: 'Inter'; transition: all .15s;
+}
+.ctrl-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+.ctrl-btn.warn { background: #fef3c7; color: var(--amber); border-color: #fbbf24; }
+.ctrl-btn.warn:hover { background: var(--amber); color: #fff; }
+.ctrl-btn.danger { background: #fef2f2; color: var(--red); border-color: #fca5a5; }
+.ctrl-btn.danger:hover { background: var(--red); color: #fff; }
+.ctrl-btn.active-btn { background: #dcfce7; color: var(--green); border-color: #86efac; }
+.ctrl-btn.full-width { grid-column: 1 / -1; }
+.ctrl-btn.emerg { background: #fef2f2; color: var(--red); border-color: #fca5a5; font-weight: 600; }
+.ctrl-btn.emerg:hover { background: var(--red); color: #fff; }
+
+.rec-banner {
+  display: none; align-items: center; gap: 6px;
+  background: #fef2f2; color: var(--red); border-radius: 6px;
+  padding: 6px 10px; font-size: 0.72rem; font-weight: 700;
+  margin-top: 10px; grid-column: 1 / -1;
+}
+.rec-banner.show { display: flex; }
+.rec-blink { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: pulse 1s infinite; }
+
+/* ── CENTRAL CONTROL ─────────────────────────────────── */
+.central-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+.site-summary-card {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; cursor: pointer;
+  transition: box-shadow .15s; position: relative; overflow: hidden;
+}
+.site-summary-card:hover { box-shadow: 0 2px 14px rgba(21,35,58,0.1); }
+.site-summary-card::before { content:''; position: absolute; left:0; top:0; bottom:0; width:3px; }
+.ug-card::before { background: #c9a227; }
+.ke-card::before { background: #2d5f5d; }
+.tz-card::before { background: #4a7bc4; }
+.rw-card::before { background: #7a3b46; }
+.sc-flag { font-size: 1.4rem; margin-bottom: 6px; }
+.sc-name { font-weight: 700; font-size: 0.85rem; color: var(--navy); margin-bottom: 2px; }
+.sc-rooms { font-size: 0.72rem; color: var(--muted); margin-bottom: 8px; }
+.sc-online { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--green); font-weight: 600; }
+
+.master-controls {
+  background: var(--navy); color: #fff; border-radius: var(--radius);
+  padding: 20px 22px; margin-bottom: 20px;
+}
+.mc-title { font-family: 'Source Serif 4', serif; font-size: 1rem; color: #f3d98a; margin-bottom: 4px; }
+.mc-sub { font-size: 0.75rem; color: #7a9ab5; margin-bottom: 16px; }
+.mc-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.mc-btn {
+  height: 52px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05); font-size: 0.8rem; color: #dfe6ee;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 7px; font-family: 'Inter'; transition: all .15s;
+}
+.mc-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.mc-btn.mc-gold { background: rgba(201,162,39,0.15); border-color: rgba(201,162,39,0.4); color: #f3d98a; }
+.mc-btn.mc-gold:hover { background: var(--gold); color: #3a2c05; border-color: var(--gold); }
+.mc-btn.mc-red { background: rgba(185,28,28,0.15); border-color: rgba(185,28,28,0.4); color: #fca5a5; }
+.mc-btn.mc-red:hover { background: var(--red); color: #fff; }
+
+.audit-log {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.log-title { font-size: 0.75rem; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; display: flex; justify-content: space-between; }
+.log-entry {
+  display: flex; align-items: baseline; gap: 10px;
+  font-size: 0.78rem; padding: 6px 0; border-bottom: 1px solid var(--line);
+}
+.log-entry:last-child { border-bottom: none; }
+.log-time { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: 0.72rem; flex-shrink: 0; min-width: 60px; }
+.log-site { font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: 700; flex-shrink: 0; }
+.ls-ug { background: #fef9e7; color: #92400e; }
+.ls-ke { background: #eef3f1; color: #0f4c3a; }
+.ls-tz { background: #eff6ff; color: #1e40af; }
+.ls-rw { background: #fbf3f4; color: var(--shield); }
+.ls-hub { background: #f0fdf4; color: #14532d; }
+.log-msg { color: var(--ink); flex: 1; }
+
+/* ── SAFEGUARDS ──────────────────────────────────────── */
+.safe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.safe-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.safe-num { font-family: 'JetBrains Mono', monospace; color: var(--gold); font-size: 0.72rem; margin-bottom: 5px; }
+.safe-card h3 { font-family: 'Source Serif 4', serif; font-size: 0.92rem; color: var(--navy); margin-bottom: 6px; }
+.safe-card p { font-size: 0.8rem; color: var(--ink); line-height: 1.55; }
+
+.callout { background: #fff; border-left: 4px solid var(--teal); border-radius: 0 8px 8px 0; padding: 14px 16px; font-size: 0.85rem; line-height: 1.55; color: var(--ink); margin: 16px 0; }
+.callout.shield { border-left-color: var(--shield); background: #fbf3f4; }
+
+/* ── SPEC TABLE ──────────────────────────────────────── */
+.spec-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.spec-table th { text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--paper); padding: 9px 14px; border-bottom: 1px solid var(--line); }
+.spec-table td { padding: 9px 14px; font-size: 0.82rem; border-bottom: 1px solid var(--line); }
+.spec-table tr:last-child td { border-bottom: none; }
+.spec-table tr:nth-child(even) td { background: #fafaf8; }
+
+/* ── TOAST ───────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  background: var(--navy); color: #fff; border-radius: 10px;
+  padding: 12px 18px; font-size: 0.82rem; max-width: 320px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transform: translateY(80px); opacity: 0; transition: all .3s ease;
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.show { transform: none; opacity: 1; }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── MODAL ───────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(13,23,38,0.55);
+  z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--paper); border-radius: 14px; padding: 28px 28px;
+  max-width: 460px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+.modal h3 { font-family: 'Source Serif 4', serif; font-size: 1.1rem; color: var(--navy); margin-bottom: 8px; }
+.modal p { font-size: 0.85rem; color: var(--ink); line-height: 1.55; margin-bottom: 20px; }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-btn { padding: 9px 20px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); font-family: 'Inter'; font-size: 0.83rem; cursor: pointer; color: var(--navy); }
+.modal-btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); font-weight: 600; }
+.modal-btn.danger { background: var(--red); color: #fff; border-color: var(--red); font-weight: 600; }
+
+@media(max-width:880px) {
+  .app { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; }
+  .stat-grid, .central-grid { grid-template-columns: 1fr 1fr; }
+  .mc-grid { grid-template-columns: 1fr 1fr; }
+  .safe-grid { grid-template-columns: 1fr; }
+  .main { padding: 20px 16px; }
+}
 </style>
 </head>
 <body>
 
-<div class="panel">
+<div class="app">
 
-  <div class="header">
-    <div class="room-name">Uganda HQ Boardroom</div>
-    <div class="status"><span class="dot"></span>connected</div>
+  <!-- ── SIDEBAR ─────────────────────────────── -->
+  <div class="sidebar">
+    <div class="brand">Global Consults<br>Limited</div>
+    <div class="brand-sub">AV Control Dashboard</div>
+    <div class="brand-role">Systems Administrator · AV Division</div>
+
+    <div class="nav-section">Central</div>
+    <div class="nav-item active" data-panel="central"><span class="nav-dot dot-hub"></span>Central Control Hub</div>
+
+    <div class="nav-section">Sites</div>
+    <div class="nav-item" data-panel="uganda"><span class="nav-dot dot-ug"></span>Uganda HQ — Kampala</div>
+    <div class="nav-item" data-panel="kenya"><span class="nav-dot dot-ke"></span>Kenya — Nairobi</div>
+    <div class="nav-item" data-panel="tanzania"><span class="nav-dot dot-tz"></span>Tanzania — Dar es Salaam</div>
+    <div class="nav-item" data-panel="rwanda"><span class="nav-dot dot-rw"></span>Rwanda — Kigali</div>
+
+    <div class="nav-section">System</div>
+    <div class="nav-item" data-panel="specs"><span class="nav-dot" style="background:#4a5568;"></span>Equipment Specs</div>
+    <div class="nav-item" data-panel="safeguards"><span class="nav-dot" style="background:var(--shield);"></span>GBV Safeguards</div>
+
+    <div class="sidebar-status">
+      <div class="status-row"><span class="pulse"></span>All 4 sites online</div>
+      <div class="status-row" style="font-size:0.68rem; color:#3d5060;">HQ · Nairobi · Dar · Kigali</div>
+    </div>
   </div>
 
-  <div class="rec-banner" id="recBanner">
-    <span class="rec-dot"></span> RECORDING IN PROGRESS
+  <!-- ── MAIN ───────────────────────────────── -->
+  <div class="main">
+
+    <!-- CENTRAL CONTROL HUB -->
+    <div class="panel active" id="central">
+      <h1 class="page-title">Central Control Hub</h1>
+      <p class="page-sub">You are managing AV systems across all four Global Consults offices from Uganda HQ. Any control action taken here is pushed to the target site over an encrypted VPN tunnel and logged automatically.</p>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="s-label">Sites online</div><div class="s-val">4 / 4</div><div class="s-sub">UG · KE · TZ · RW</div></div>
+        <div class="stat-card"><div class="s-label">Total rooms</div><div class="s-val">10</div><div class="s-sub">4 boardrooms · 6 consultation rooms</div></div>
+        <div class="stat-card"><div class="s-label">Active calls</div><div class="s-val" id="active-call-count">0</div><div class="s-sub">Across all sites right now</div></div>
+        <div class="stat-card"><div class="s-label">Recording</div><div class="s-val" style="color:var(--green);">None</div><div class="s-sub">No active recordings — policy enforced</div></div>
+      </div>
+
+      <!-- Site summary cards — click to go to site -->
+      <h2 class="sh" style="border-top:none;padding-top:0;margin-top:0;">All sites at a glance</h2>
+      <div class="central-grid">
+        <div class="site-summary-card ug-card" onclick="switchPanel('uganda')">
+          <div class="sc-flag">🇺🇬</div>
+          <div class="sc-name">Uganda HQ</div>
+          <div class="sc-rooms">1 boardroom · 3 consultation rooms</div>
+          <div class="sc-online"><span class="pulse" style="width:7px;height:7px;"></span>Online · Kampala</div>
+        </div>
+        <div class="site-summary-card ke-card" onclick="switchPanel('kenya')">
+          <div class="sc-flag">🇰🇪</div>
+          <div class="sc-name">Kenya Office</div>
+          <div class="sc-rooms">1 boardroom · 2 consultation rooms</div>
+          <div class="sc-online"><span class="pulse" style="width:7px;height:7px;"></span>Online · Nairobi</div>
+        </div>
+        <div class="site-summary-card tz-card" onclick="switchPanel('tanzania')">
+          <div class="sc-flag">🇹🇿</div>
+          <div class="sc-name">Tanzania Office</div>
+          <div class="sc-rooms">1 boardroom · 2 consultation rooms</div>
+          <div class="sc-online"><span class="pulse" style="width:7px;height:7px;"></span>Online · Dar es Salaam</div>
+        </div>
+        <div class="site-summary-card rw-card" onclick="switchPanel('rwanda')">
+          <div class="sc-flag">🇷🇼</div>
+          <div class="sc-name">Rwanda Office</div>
+          <div class="sc-rooms">1 boardroom · 2 consultation rooms</div>
+          <div class="sc-online"><span class="pulse" style="width:7px;height:7px;"></span>Online · Kigali</div>
+        </div>
+      </div>
+
+      <!-- Master controls -->
+      <div class="master-controls">
+        <div class="mc-title">Master controls — all sites</div>
+        <div class="mc-sub">These commands push to every room across all four countries simultaneously.</div>
+        <div class="mc-grid">
+          <button class="mc-btn mc-gold" onclick="masterAction('Mute all microphones across all 4 sites','🔇','#f3d98a')">🔇 Mute all mics — all sites</button>
+          <button class="mc-btn mc-gold" onclick="masterAction('Close all camera shutters across all 4 sites','📷','#f3d98a')">📷 Close all shutters — all sites</button>
+          <button class="mc-btn" onclick="masterAction('Push latest firmware policy to all 4 sites','⚙️','#dfe6ee')">⚙️ Push policy update</button>
+          <button class="mc-btn" onclick="masterAction('Confirm: recording is disabled on all consultation rooms across all sites','✅','#86efac')">✅ Verify recording policy</button>
+          <button class="mc-btn" onclick="masterAction('Generating full audit log export for all 4 sites','📋','#dfe6ee')">📋 Export audit log</button>
+          <button class="mc-btn mc-red" onclick="confirmEmergency()">🚨 Emergency stop — all sites</button>
+        </div>
+      </div>
+
+      <!-- Audit log -->
+      <div class="audit-log">
+        <div class="log-title">
+          <span>Audit log</span>
+          <span style="font-weight:400;color:var(--muted);">Last 10 events — auto-updates</span>
+        </div>
+        <div id="audit-entries"></div>
+      </div>
+    </div>
+
+    <!-- UGANDA HQ -->
+    <div class="panel" id="uganda">
+      <div class="site-banner">
+        <div class="site-flag">🇺🇬</div>
+        <div class="site-banner-info">
+          <div class="site-title">Uganda HQ — Kampala</div>
+          <div class="site-desc">Head office · 1 boardroom · 3 private consultation rooms · Interpretation booth</div>
+        </div>
+        <div class="site-badge badge-online"><span class="pulse" style="width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;"></span>Online</div>
+      </div>
+      <div id="rooms-uganda" class="rooms-grid"></div>
+      <div class="callout shield">
+        <strong>HQ note:</strong> The three private consultation rooms have recording and cloud relay disabled at HQ policy level. Only the boardroom may initiate multi-party calls. The interpretation booth is linked to the boardroom audio feed during scheduled multilingual sessions.
+      </div>
+    </div>
+
+    <!-- KENYA -->
+    <div class="panel" id="kenya">
+      <div class="site-banner">
+        <div class="site-flag">🇰🇪</div>
+        <div class="site-banner-info">
+          <div class="site-title">Kenya Office — Nairobi</div>
+          <div class="site-desc">Branch office · 1 boardroom · 2 private consultation rooms · VPN spoke to HQ</div>
+        </div>
+        <div class="site-badge badge-online"><span class="pulse" style="width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;"></span>Online</div>
+      </div>
+      <div id="rooms-kenya" class="rooms-grid"></div>
+      <div class="callout">
+        <strong>Remote management note:</strong> All policy changes to Kenya rooms are pushed from HQ over the encrypted VPN tunnel. Branch staff cannot override consultation room recording policy locally.
+      </div>
+    </div>
+
+    <!-- TANZANIA -->
+    <div class="panel" id="tanzania">
+      <div class="site-banner">
+        <div class="site-flag">🇹🇿</div>
+        <div class="site-banner-info">
+          <div class="site-title">Tanzania Office — Dar es Salaam</div>
+          <div class="site-desc">Branch office · 1 boardroom · 2 private consultation rooms · VPN spoke to HQ</div>
+        </div>
+        <div class="site-badge badge-online"><span class="pulse" style="width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;"></span>Online</div>
+      </div>
+      <div id="rooms-tanzania" class="rooms-grid"></div>
+      <div class="callout">
+        <strong>Remote management note:</strong> All policy changes to Tanzania rooms are pushed from HQ over the encrypted VPN tunnel. Branch staff cannot override consultation room recording policy locally.
+      </div>
+    </div>
+
+    <!-- RWANDA -->
+    <div class="panel" id="rwanda">
+      <div class="site-banner">
+        <div class="site-flag">🇷🇼</div>
+        <div class="site-banner-info">
+          <div class="site-title">Rwanda Office — Kigali</div>
+          <div class="site-desc">Branch office · 1 boardroom · 2 private consultation rooms · VPN spoke to HQ</div>
+        </div>
+        <div class="site-badge badge-online"><span class="pulse" style="width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;"></span>Online</div>
+      </div>
+      <div id="rooms-rwanda" class="rooms-grid"></div>
+      <div class="callout">
+        <strong>Remote management note:</strong> All policy changes to Rwanda rooms are pushed from HQ over the encrypted VPN tunnel. Branch staff cannot override consultation room recording policy locally.
+      </div>
+    </div>
+
+    <!-- SPECS -->
+    <div class="panel" id="specs">
+      <h1 class="page-title">Equipment Specifications</h1>
+      <p class="page-sub">All four sites follow two room profiles: an open boardroom for general business, and a locked-down private consultation room for survivor-facing work.</p>
+      <h2 class="sh" style="border-top:none;padding-top:0;margin-top:0;">Boardroom profile — Uganda HQ (40 pax)</h2>
+      <table class="spec-table" style="margin-bottom:20px;">
+        <thead><tr><th>Component</th><th>Specification</th><th>GBV note</th></tr></thead>
+        <tbody>
+          <tr><td>Displays</td><td>2× 86" 4K interactive panels</td><td>—</td></tr>
+          <tr><td>Cameras</td><td>3× 4K PTZ, auto-tracking</td><td>Hardware privacy shutters fitted</td></tr>
+          <tr><td>Microphones</td><td>Ceiling mic array 8 elements + 5× table mic pods</td><td>No auto-transcription enabled</td></tr>
+          <tr><td>DSP / Codec</td><td>Full DSP, AEC, AES-256 encrypted codec</td><td>—</td></tr>
+          <tr><td>Control</td><td>10" wall touch panel + BYOD hub</td><td>PIN-protected, audit logged</td></tr>
+          <tr><td>Special</td><td>Interpretation booth — 2 headsets, 1 mic, 1 monitor</td><td>Language access for survivors</td></tr>
+        </tbody>
+      </table>
+      <h2 class="sh">Boardroom profile — Kenya / Tanzania / Rwanda (20 pax)</h2>
+      <table class="spec-table" style="margin-bottom:20px;">
+        <thead><tr><th>Component</th><th>Kenya / Tanzania</th><th>Rwanda</th></tr></thead>
+        <tbody>
+          <tr><td>Display</td><td>1× 75" 4K interactive panel</td><td>1× 65" 4K interactive panel</td></tr>
+          <tr><td>Cameras</td><td>2× 4K PTZ + hardware shutters</td><td>1× 4K PTZ + hardware shutter</td></tr>
+          <tr><td>Microphones</td><td>Ceiling mic array 6 elements</td><td>4× wireless table mic pods</td></tr>
+          <tr><td>DSP / Codec</td><td>DSP + AES-256 encrypted codec</td><td>Compact DSP + codec</td></tr>
+          <tr><td>Control</td><td>10" wall touch panel + BYOD hub</td><td>10" wall touch panel + BYOD hub</td></tr>
+        </tbody>
+      </table>
+      <h2 class="sh">Private consultation room profile — all sites</h2>
+      <table class="spec-table">
+        <thead><tr><th>Component</th><th>Specification</th><th>GBV requirement</th></tr></thead>
+        <tbody>
+          <tr><td>Display</td><td>50–55" UHD, single screen</td><td>—</td></tr>
+          <tr><td>Camera</td><td>Fixed wide-angle only — no PTZ, no auto-framing</td><td>System never hunts for or zooms onto a survivor's face</td></tr>
+          <tr><td>Privacy shutter</td><td>Manual sliding cover on every camera</td><td>Physical guarantee camera is off, not just a software mute</td></tr>
+          <tr><td>Microphone</td><td>Directional desk mic + headset option</td><td>Minimal audio capture radius</td></tr>
+          <tr><td>Codec</td><td>Point-to-point encrypted only — no cloud bridge</td><td>No third party can be silently added to a call</td></tr>
+          <tr><td>Recording</td><td>Disabled at HQ policy level — cannot be enabled locally</td><td>No permanent record of disclosure created without explicit consent</td></tr>
+          <tr><td>Acoustic</td><td>Soundproofing panels + sealed door</td><td>Conversation does not bleed into corridors</td></tr>
+          <tr><td>Network</td><td>Isolated VLAN — no cross-VLAN access</td><td>Call traffic stays separate from general office traffic</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SAFEGUARDS -->
+    <div class="panel" id="safeguards">
+      <h1 class="page-title">GBV Safeguarding Controls</h1>
+      <p class="page-sub">Each control maps to a specific way a standard video conferencing system could expose or re-traumatise a survivor. These are engineering requirements, not preferences.</p>
+      <div class="safe-grid">
+        <div class="safe-card"><div class="safe-num">01</div><h3>Recording disabled at policy level</h3><p>Consultation rooms have recording, transcription and cloud storage features disabled centrally — not just unticked locally — so no counsellor or admin can accidentally create a permanent record of a disclosure.</p></div>
+        <div class="safe-card"><div class="safe-num">02</div><h3>No auto-framing or face tracking</h3><p>Consultation rooms use fixed wide-angle lenses only. The system never actively hunts for and zooms onto a survivor's face. PTZ auto-framing is reserved for boardrooms only.</p></div>
+        <div class="safe-card"><div class="safe-num">03</div><h3>Physical camera privacy shutters</h3><p>Every consultation room camera has a manual sliding cover, giving the survivor and counsellor a visible, non-digital guarantee that the camera is off — important when trust in "the app says it's off" is not enough.</p></div>
+        <div class="safe-card"><div class="safe-num">04</div><h3>Point-to-point encrypted calls only</h3><p>Consultation rooms connect counsellor-to-survivor directly, end-to-end encrypted, never through a multi-party cloud bridge that a third party could be added to without either party knowing.</p></div>
+        <div class="safe-card"><div class="safe-num">05</div><h3>Soundproofing and acoustic isolation</h3><p>Acoustic panels and sealed doors stop conversations bleeding into corridors or adjoining offices — a physical AV specification item, not just a software control.</p></div>
+        <div class="safe-card"><div class="safe-num">06</div><h3>Local admit-only join</h3><p>Every consultation room call requires the in-room counsellor to admit each participant individually. No waiting-room bypass, no link-sharing that lets an unvetted person drop in.</p></div>
+        <div class="safe-card"><div class="safe-num">07</div><h3>HQ remote access disabled by default</h3><p>Even the HQ admin (you) cannot view or join a consultation room session without break-glass authentication, which is automatically logged and timestamped in the central audit trail.</p></div>
+        <div class="safe-card"><div class="safe-num">08</div><h3>Content-blind audit logging</h3><p>HQ logs who joined which room and when — for accountability and safety — but never logs or stores call audio or video content. The log proves access happened without creating a record of what was said.</p></div>
+      </div>
+      <div class="callout shield" style="margin-top:20px;">
+        <strong>Net effect:</strong> the Boardroom tier optimises for normal collaboration — clarity, scheduling ease, screen share. The Private Consultation Room tier optimises for the opposite: minimal data capture, maximal local control, and a paper-trail-free conversation. For this organisation, that privacy guarantee is the actual product being delivered.
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-dot" id="toast-dot" style="background:#22c55e;"></span>
+  <span id="toast-msg">Action completed</span>
+</div>
+
+<!-- Emergency modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>🚨 Confirm emergency stop — all sites</h3>
+    <p>This will immediately: end all active calls, mute all microphones, close all camera shutters, and disable recording across all 10 rooms in all 4 countries. This action is logged and cannot be undone remotely. Are you sure?</p>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn danger" onclick="executeEmergency()">Confirm emergency stop</button>
+    </div>
   </div>
-
-  <div class="grid">
-    <button class="btn" id="meetingBtn" onclick="toggleMeeting()">
-      <span class="icon">📹</span>
-      <span id="meetingLabel">Start Meeting</span>
-    </button>
-
-    <button class="btn" id="muteBtn" onclick="toggleMute()">
-      <span class="icon" id="muteIcon">🎤</span>
-      <span id="muteLabel">Mute All Mics</span>
-    </button>
-
-    <button class="btn" id="shutterBtn" onclick="toggleShutter()">
-      <span class="icon" id="shutterIcon">📷</span>
-      <span id="shutterLabel">Open Camera</span>
-    </button>
-
-    <button class="btn" id="recordBtn" onclick="toggleRecord()">
-      <span class="icon">⏺️</span>
-      <span id="recordLabel">Start Recording</span>
-    </button>
-  </div>
-
-  <button class="row-btn" onclick="alert('Calling HQ IT Support...')">
-    🎧 Call HQ IT Support
-  </button>
-
-  <button class="emergency" onclick="emergencyStop()">
-    ⚠️ EMERGENCY STOP ALL
-  </button>
-
-  <div class="footer-note">
-    No recording starts automatically &middot; Camera shutter defaults to closed
-  </div>
-
 </div>
 
 <script>
-  let meetingOn = false;
-  let muted = false;
-  let shutterClosed = true;
-  let recording = false;
-
-  function toggleMeeting() {
-    meetingOn = !meetingOn;
-    document.getElementById('meetingLabel').textContent = meetingOn ? 'End Meeting' : 'Start Meeting';
-    document.getElementById('meetingBtn').classList.toggle('active', meetingOn);
+// ── ROOM DATA ────────────────────────────────────────────────────────
+const SITES = {
+  uganda: {
+    label: 'Uganda HQ',
+    flag: '🇺🇬',
+    logClass: 'ls-ug',
+    rooms: [
+      { id:'ug-br', name:'HQ Executive Boardroom', type:'board', cap:'40 pax' },
+      { id:'ug-pcr-a', name:'Private Consultation Room A', type:'priv', cap:'2–4 pax' },
+      { id:'ug-pcr-b', name:'Private Consultation Room B', type:'priv', cap:'2–4 pax' },
+      { id:'ug-pcr-c', name:'Private Consultation Room C', type:'priv', cap:'2–4 pax' },
+    ]
+  },
+  kenya: {
+    label: 'Kenya — Nairobi',
+    flag: '🇰🇪',
+    logClass: 'ls-ke',
+    rooms: [
+      { id:'ke-br', name:'Nairobi Boardroom', type:'board', cap:'20 pax' },
+      { id:'ke-pcr-1', name:'Consultation Room 1', type:'priv', cap:'2–4 pax' },
+      { id:'ke-pcr-2', name:'Consultation Room 2', type:'priv', cap:'2–4 pax' },
+    ]
+  },
+  tanzania: {
+    label: 'Tanzania — Dar es Salaam',
+    flag: '🇹🇿',
+    logClass: 'ls-tz',
+    rooms: [
+      { id:'tz-br', name:'Dar es Salaam Boardroom', type:'board', cap:'20 pax' },
+      { id:'tz-pcr-1', name:'Consultation Room 1', type:'priv', cap:'2–4 pax' },
+      { id:'tz-pcr-2', name:'Consultation Room 2', type:'priv', cap:'2–4 pax' },
+    ]
+  },
+  rwanda: {
+    label: 'Rwanda — Kigali',
+    flag: '🇷🇼',
+    logClass: 'ls-rw',
+    rooms: [
+      { id:'rw-br', name:'Kigali Boardroom', type:'board', cap:'15 pax' },
+      { id:'rw-pcr-1', name:'Consultation Room 1', type:'priv', cap:'2–4 pax' },
+      { id:'rw-pcr-2', name:'Consultation Room 2', type:'priv', cap:'2–4 pax' },
+    ]
   }
+};
 
-  function toggleMute() {
-    muted = !muted;
-    document.getElementById('muteLabel').textContent = muted ? 'Unmute All Mics' : 'Mute All Mics';
-    document.getElementById('muteIcon').textContent = muted ? '🔇' : '🎤';
-    document.getElementById('muteBtn').classList.toggle('warn', muted);
-  }
+// Room state store
+const roomState = {};
+Object.values(SITES).forEach(site => {
+  site.rooms.forEach(r => {
+    roomState[r.id] = {
+      meeting: false, muted: false, shutterClosed: true, recording: false
+    };
+  });
+});
 
-  function toggleShutter() {
-    shutterClosed = !shutterClosed;
-    document.getElementById('shutterLabel').textContent = shutterClosed ? 'Open Camera' : 'Close Camera';
-    document.getElementById('shutterIcon').textContent = shutterClosed ? '🚫' : '📷';
-    document.getElementById('shutterBtn').classList.toggle('active', !shutterClosed);
-  }
+// ── RENDER ROOMS ─────────────────────────────────────────────────────
+function renderRooms(siteKey) {
+  const site = SITES[siteKey];
+  const container = document.getElementById('rooms-' + siteKey);
+  if (!container) return;
+  container.innerHTML = '';
+  site.rooms.forEach(room => {
+    const state = roomState[room.id];
+    const isPriv = room.type === 'priv';
+    const statusText = state.meeting ? 'Call active' : 'Idle';
+    const statusClass = state.meeting ? 's-active' : 's-idle';
 
-  function toggleRecord() {
-    recording = !recording;
-    document.getElementById('recordLabel').textContent = recording ? 'Stop Recording' : 'Start Recording';
-    document.getElementById('recordBtn').classList.toggle('danger-active', recording);
-    document.getElementById('recBanner').classList.toggle('show', recording);
-  }
+    const card = document.createElement('div');
+    card.className = 'room-card';
+    card.id = 'card-' + room.id;
+    card.innerHTML = `
+      <div class="room-top">
+        <div class="room-name">${room.name}</div>
+        <span class="rtag ${isPriv ? 'rtag-priv' : 'rtag-board'}">${isPriv ? 'Private' : 'Boardroom'} · ${room.cap}</span>
+      </div>
+      <div class="room-status">
+        <span class="status-dot ${statusClass}"></span>
+        <span>${statusText}${state.muted ? ' · Mics muted' : ''}${state.shutterClosed ? ' · Shutter closed' : ' · Camera open'}</span>
+      </div>
+      <div class="room-controls">
+        <button class="ctrl-btn ${state.meeting ? 'active-btn' : ''}" id="meet-${room.id}" onclick="toggleMeeting('${room.id}','${siteKey}')">
+          ${state.meeting ? '📹 End call' : '📹 Start call'}
+        </button>
+        <button class="ctrl-btn ${state.muted ? 'warn' : ''}" id="mute-${room.id}" onclick="toggleMute('${room.id}','${siteKey}')">
+          ${state.muted ? '🔇 Unmute mics' : '🎤 Mute mics'}
+        </button>
+        <button class="ctrl-btn ${state.shutterClosed ? '' : 'active-btn'}" id="shut-${room.id}" onclick="toggleShutter('${room.id}','${siteKey}')">
+          ${state.shutterClosed ? '📷 Open shutter' : '🚫 Close shutter'}
+        </button>
+        ${isPriv
+          ? `<button class="ctrl-btn danger" style="cursor:not-allowed;opacity:0.5;" disabled title="Recording disabled by HQ policy">⏺ Recording off (policy)</button>`
+          : `<button class="ctrl-btn ${state.recording ? 'danger' : ''}" id="rec-${room.id}" onclick="toggleRecord('${room.id}','${siteKey}')">
+               ${state.recording ? '⏹ Stop recording' : '⏺ Start recording'}
+             </button>`
+        }
+        <div class="rec-banner ${state.recording ? 'show' : ''}" id="recbanner-${room.id}">
+          <span class="rec-blink"></span>RECORDING IN PROGRESS
+        </div>
+        <button class="ctrl-btn emerg full-width" onclick="roomEmergency('${room.id}','${siteKey}','${room.name}')">
+          ⚠️ Emergency stop this room
+        </button>
+      </div>`;
+    container.appendChild(card);
+  });
+}
 
-  function emergencyStop() {
-    meetingOn = false;
-    recording = false;
-    shutterClosed = true;
-    muted = true;
+// ── CONTROLS ─────────────────────────────────────────────────────────
+function toggleMeeting(id, siteKey) {
+  roomState[id].meeting = !roomState[id].meeting;
+  const on = roomState[id].meeting;
+  if (!on) { roomState[id].recording = false; }
+  renderRooms(siteKey);
+  updateActiveCallCount();
+  const site = SITES[siteKey];
+  addLog(site.logClass, site.label, (on ? 'Call started' : 'Call ended') + ' — ' + SITES[siteKey].rooms.find(r=>r.id===id).name);
+  toast(on ? '📹 Call started' : '📹 Call ended', '#22c55e');
+}
 
-    document.getElementById('meetingLabel').textContent = 'Start Meeting';
-    document.getElementById('meetingBtn').classList.remove('active');
+function toggleMute(id, siteKey) {
+  roomState[id].muted = !roomState[id].muted;
+  renderRooms(siteKey);
+  const site = SITES[siteKey];
+  const roomName = site.rooms.find(r=>r.id===id).name;
+  addLog(site.logClass, site.label, (roomState[id].muted ? 'Mics muted' : 'Mics unmuted') + ' — ' + roomName);
+  toast(roomState[id].muted ? '🔇 Mics muted' : '🎤 Mics unmuted', '#f59e0b');
+}
 
-    document.getElementById('recordLabel').textContent = 'Start Recording';
-    document.getElementById('recordBtn').classList.remove('danger-active');
-    document.getElementById('recBanner').classList.remove('show');
+function toggleShutter(id, siteKey) {
+  roomState[id].shutterClosed = !roomState[id].shutterClosed;
+  renderRooms(siteKey);
+  const site = SITES[siteKey];
+  const roomName = site.rooms.find(r=>r.id===id).name;
+  addLog(site.logClass, site.label, (roomState[id].shutterClosed ? 'Camera shutter closed' : 'Camera shutter opened') + ' — ' + roomName);
+  toast(roomState[id].shutterClosed ? '🚫 Camera shutter closed' : '📷 Camera shutter opened', '#4a7bc4');
+}
 
-    document.getElementById('shutterLabel').textContent = 'Open Camera';
-    document.getElementById('shutterIcon').textContent = '🚫';
-    document.getElementById('shutterBtn').classList.remove('active');
+function toggleRecord(id, siteKey) {
+  roomState[id].recording = !roomState[id].recording;
+  renderRooms(siteKey);
+  const site = SITES[siteKey];
+  const roomName = site.rooms.find(r=>r.id===id).name;
+  addLog(site.logClass, site.label, (roomState[id].recording ? '⏺ Recording STARTED' : '⏹ Recording stopped') + ' — ' + roomName);
+  toast(roomState[id].recording ? '⏺ Recording started' : '⏹ Recording stopped', roomState[id].recording ? '#ef4444' : '#22c55e');
+}
 
-    document.getElementById('muteLabel').textContent = 'Unmute All Mics';
-    document.getElementById('muteIcon').textContent = '🔇';
-    document.getElementById('muteBtn').classList.add('warn');
+function roomEmergency(id, siteKey, roomName) {
+  roomState[id].meeting = false;
+  roomState[id].muted = true;
+  roomState[id].shutterClosed = true;
+  roomState[id].recording = false;
+  renderRooms(siteKey);
+  updateActiveCallCount();
+  const site = SITES[siteKey];
+  addLog(site.logClass, site.label, '🚨 EMERGENCY STOP — ' + roomName);
+  toast('🚨 Emergency stop: ' + roomName, '#ef4444');
+}
 
-    alert('Emergency stop activated: meeting ended, recording stopped, camera closed, mics muted.');
-  }
+function updateActiveCallCount() {
+  const count = Object.values(roomState).filter(s => s.meeting).length;
+  document.getElementById('active-call-count').textContent = count;
+}
+
+// ── MASTER CONTROLS ───────────────────────────────────────────────────
+function masterAction(msg, dotColor, color) {
+  addLog('ls-hub', 'Central HQ', msg);
+  toast(msg, dotColor || '#22c55e');
+}
+
+function confirmEmergency() {
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+function executeEmergency() {
+  closeModal();
+  Object.keys(roomState).forEach(id => {
+    roomState[id].meeting = false;
+    roomState[id].muted = true;
+    roomState[id].shutterClosed = true;
+    roomState[id].recording = false;
+  });
+  ['uganda','kenya','tanzania','rwanda'].forEach(s => renderRooms(s));
+  updateActiveCallCount();
+  addLog('ls-hub', 'Central HQ', '🚨 GLOBAL EMERGENCY STOP — all 10 rooms across all 4 sites');
+  toast('🚨 Emergency stop executed across all sites', '#ef4444');
+}
+
+// ── AUDIT LOG ─────────────────────────────────────────────────────────
+const logEntries = [
+  { cls:'ls-hub', site:'Central HQ', msg:'System online — all 4 sites connected' },
+  { cls:'ls-ug',  site:'Uganda HQ',  msg:'Dashboard loaded — Kampala boardroom ready' },
+  { cls:'ls-ke',  site:'Kenya',      msg:'VPN tunnel confirmed — Nairobi site online' },
+  { cls:'ls-tz',  site:'Tanzania',   msg:'VPN tunnel confirmed — Dar es Salaam online' },
+  { cls:'ls-rw',  site:'Rwanda',     msg:'VPN tunnel confirmed — Kigali site online' },
+];
+
+function addLog(cls, site, msg) {
+  const now = new Date();
+  const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+  logEntries.unshift({ cls, site, msg, t });
+  if (logEntries.length > 20) logEntries.pop();
+  renderLog();
+}
+
+function renderLog() {
+  const el = document.getElementById('audit-entries');
+  if (!el) return;
+  el.innerHTML = logEntries.slice(0,10).map(e => `
+    <div class="log-entry">
+      <span class="log-time">${e.t || '00:00:00'}</span>
+      <span class="log-site ${e.cls}">${e.site}</span>
+      <span class="log-msg">${e.msg}</span>
+    </div>`).join('');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, dotColor) {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-dot').style.background = dotColor || '#22c55e';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────
+function switchPanel(id) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i => {
+    if (i.dataset.panel === id) i.classList.add('active');
+  });
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => switchPanel(item.dataset.panel));
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────
+renderLog();
+Object.keys(SITES).forEach(s => renderRooms(s));
 </script>
-
 </body>
 </html>
