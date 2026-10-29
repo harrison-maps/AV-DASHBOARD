@@ -1,4 +1,4 @@
-# AV Dashboard 📊
+# AV Dashboard 📊 
 
 An advanced audiovisual systems dashboard providing centralized control and monitoring of AV equipment, displays, and media distribution systems.
 
